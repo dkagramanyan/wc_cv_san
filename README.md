@@ -93,7 +93,7 @@ python dataset_tool.py --source=./data/ffhq/ --dest=./data/ffhq1024.zip \
 ### Training
 ```
 python train.py --outdir=./training-runs/ffhq --cfg=stylegan3-r --data=./data/ffhq16.zip \
-        --gpus=8 --batch=2048 --mirror=1 --snap 10 --batch-gpu 8 --kimg 300000 --syn_layers 6
+        --gpus=8 --batch=2048 --mirror=1 --snap 10 --batch-gpu 8 squeue --syn_layers 6
 
 python train.py --outdir=./training-runs/ffhq --cfg=stylegan3-r --data=./data/ffhq32.zip \
         --gpus=8 --batch=2048 --mirror=1 --snap 10 --batch-gpu 8 --kimg 175000 --syn_layers 6 \
