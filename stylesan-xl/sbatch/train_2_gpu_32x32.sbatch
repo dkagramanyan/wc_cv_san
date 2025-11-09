@@ -21,7 +21,7 @@ python train.py --outdir=./training-runs/ffhq \
         --gpus=2 \
         --batch=192 \
         --mirror=1 \
-        --snap 500 \
+        --snap 250 \
         --batch-gpu 96 \
         --kimg 10000 \
         --cond True \
