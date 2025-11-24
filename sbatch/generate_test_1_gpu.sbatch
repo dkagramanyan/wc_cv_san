@@ -15,9 +15,10 @@ module load gnu13/13.3
 source activate san
 
 python gen_class_samplesheet.py \
+  --batch-gpu=4 \
   --outdir=generated \
   --trunc=0.7 \
-  --samples-per-class 10000 \
+  --samples-per-class 10 \
   --classes 0,1,2 \
   --grid-width 1 \
   --network=./runs/ffhq/00016-stylegan3-r-o_bc_left_4x_1536_1024x1024_rgb_256x256-gpus2-batch52/best_model.pkl
