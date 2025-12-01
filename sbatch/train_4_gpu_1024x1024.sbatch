@@ -10,9 +10,12 @@
 
 module purge
 module load Python/Anaconda
-module load CUDA/12.4
-module load gnu13/13.3
 
+# nvidia a100 arch
+export TORCH_CUDA_ARCH_LIST="8.0"
+module load CUDA/12.4
+
+module load gnu13/13.3
 source activate san
 
 python train.py --outdir=./runs/wc-cv \
