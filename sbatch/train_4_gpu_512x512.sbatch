@@ -15,21 +15,19 @@ module load gnu13/13.3
 
 source activate san
 
-cd ..
-
-python train.py --outdir=./training-runs/wc-cv \
+python train.py --outdir=./runs/wc-cv \
         --cfg=stylegan3-r \
-        --data=./datasets/o_bc_left_4x_1536_1024x1024_rgb_512x512.zip \
+        --data=./datasets/imagenet_9to4_1024x1024_512x512.zip \
         --gpus=4 \
         --batch=40 \
-        --mirror=1 \
-        --snap 75 \
+        --mirror=0 \
+        --snap 100 \
         --batch-gpu 10 \
-        --kimg 10000 \
+        --kimg 20000 \
         --cond True \
         --syn_layers 6 \
         --superres \
         --up_factor 2 \
         --head_layers 7 \
-        --path_stem training-runs/ffhq/00016-stylegan3-r-o_bc_left_4x_1536_1024x1024_rgb_256x256-gpus2-batch52/best_model.pkl
+        --path_stem ./runs/wc-cv/00016-stylegan3-r-imagenet_9to4_1024x1024_512x512-gpus4-batch40/best_model.pkl
 
