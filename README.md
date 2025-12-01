@@ -12,16 +12,7 @@ Please cite [[1](#citation)] in your work when using this code in your experimen
 cd san
 pip install -r requernments.txt
 ```
-### Clip weights
 
-from here https://github.com/openai/CLIP/blob/main/clip/bpe_simple_vocab_16e6.txt.gz
-
-```bash
-mkdir in_embeddings 
-
-mkdir -p in_embeddings
-wget https://raw.githubusercontent.com/openai/CLIP/main/clip/bpe_simple_vocab_16e6.txt.gz -O in_embeddings/bpe_simple_vocab_16e6.txt.gz
-```
 
 
 
