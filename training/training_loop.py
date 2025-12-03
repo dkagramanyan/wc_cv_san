@@ -502,7 +502,7 @@ def training_loop(
                     metric_main.report_metric(result_dict, run_dir=run_dir, snapshot_pkl=snapshot_pkl)
                 stats_metrics.update(result_dict.results)
 
-            # Save weights after each FID evaluation (async to avoid blocking training)
+            # Save weights after each FID evaluation (in original .pkl format)
             if rank == 0:
                 # Find any FID metric (fid50k_full, fid10k_full, etc.)
                 fid_value = None
@@ -514,18 +514,22 @@ def training_loop(
                         break
                 
                 if fid_value is not None:
-                    # Save weights after each evaluation in format: gen_fid={fid}_training_step={training_step}.pth
+                    # Save weights after each evaluation in format matching FID value
                     training_step = cur_nimg
-                    weight_filename = os.path.join(run_dir, f'gen_fid={fid_value:.4f}_training_step={training_step}.pth')
-                    # Save G_ema state dict (move to CPU only when saving to avoid blocking)
-                    G_ema_state = {k: v.cpu().clone() for k, v in snapshot_data['G_ema'].state_dict().items()}
-                    torch.save(G_ema_state, weight_filename)
+                    # Create a copy of G_ema on CPU for saving (same format as original training loop)
+                    G_ema_cpu = copy.deepcopy(snapshot_data['G_ema']).eval().requires_grad_(False).cpu()
+                    weight_data = {'G_ema': G_ema_cpu}
+                    
+                    # Save with FID-based filename: fid={fid_value:.4f}.pkl
+                    weight_filename = os.path.join(run_dir, f'fid={fid_value:.4f}.pkl')
+                    with open(weight_filename, 'wb') as f:
+                        pickle.dump(weight_data, f)
                     print(f'Saved weights: {weight_filename}')
                     
                     # Update best FID and save best weights
                     if fid_value < best_fid:
                         # Delete old best file if it exists
-                        old_best_filename = os.path.join(run_dir, f'best_fid={best_fid:.4f}_training_step={best_fid_training_step}.pth')
+                        old_best_filename = os.path.join(run_dir, f'best_fid={best_fid:.4f}.pkl')
                         if os.path.exists(old_best_filename):
                             os.remove(old_best_filename)
                         
@@ -533,10 +537,13 @@ def training_loop(
                         best_fid = fid_value
                         best_fid_training_step = training_step
                         
-                        # Save new best weights in format: best_fid={best_fid}_training_step={training_step}.pth
-                        best_weight_filename = os.path.join(run_dir, f'best_fid={best_fid:.4f}_training_step={best_fid_training_step}.pth')
-                        torch.save(G_ema_state, best_weight_filename)
+                        # Save new best weights: best_fid={best_fid:.4f}.pkl
+                        best_weight_filename = os.path.join(run_dir, f'best_fid={best_fid:.4f}.pkl')
+                        with open(best_weight_filename, 'wb') as f:
+                            pickle.dump(weight_data, f)
                         print(f'Saved best weights: {best_weight_filename}')
+                    
+                    del G_ema_cpu  # Free memory
             
             # Synchronize all ranks after metrics evaluation and weight saving
             # This ensures rank 0 finishes saving weights before other ranks proceed to stats collection
